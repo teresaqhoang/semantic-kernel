@@ -4,11 +4,12 @@ import {
     Button,
     Label,
     makeStyles,
-    mergeClasses,
     Persona,
     Popover,
     PopoverSurface,
     PopoverTrigger,
+
+
     SelectTabEventHandler,
     shorthands,
     Tab,
@@ -17,12 +18,10 @@ import {
     tokens,
     Tooltip
 } from '@fluentui/react-components';
-import { Alert } from '@fluentui/react-components/unstable';
-import { Dismiss16Regular, Edit24Filled, EditRegular, Map16Regular, Person16Regular } from '@fluentui/react-icons';
+import { Edit24Filled, EditRegular, Map16Regular, Person16Regular } from '@fluentui/react-icons';
 import React, { useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
+import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
-import { removeAlert } from '../../redux/features/app/appSlice';
 import { FeatureKeys } from '../../redux/features/app/AppState';
 import { ChatResourceList } from './ChatResourceList';
 import { ChatRoom } from './ChatRoom';
@@ -76,18 +75,6 @@ const useClasses = makeStyles({
     input: {
         width: '100%',
     },
-    alert: {
-        ...shorthands.borderRadius(0),
-    },
-    infoAlert: {
-        fontWeight: tokens.fontWeightRegular,
-        color: tokens.colorNeutralForeground1,
-        backgroundColor: tokens.colorNeutralBackground6,
-        ...shorthands.borderRadius(0),
-        fontSize: tokens.fontSizeBase200,
-        lineHeight: tokens.lineHeightBase200,
-        ...shorthands.borderBottom(tokens.strokeWidthThin, 'solid', tokens.colorNeutralStroke1),
-    },
     buttons: {
         display: 'flex',
         alignSelf: 'end',
@@ -97,8 +84,7 @@ const useClasses = makeStyles({
 
 export const ChatWindow: React.FC = () => {
     const classes = useClasses();
-    const dispatch = useAppDispatch();
-    const { alerts, features } = useAppSelector((state: RootState) => state.app);
+    const { features } = useAppSelector((state: RootState) => state.app);
 
     const showShareBotMenu =
         !features[FeatureKeys.SimplifiedExperience].enabled &&
@@ -114,34 +100,8 @@ export const ChatWindow: React.FC = () => {
         setSelectedTab(data.value);
     };
 
-    const onDismissAlert = (index: number) => {
-        dispatch(removeAlert(index));
-    };
-
     return (
         <div className={classes.root}>
-            {alerts.map(({ type, message }, index) => {
-                return (
-                    <Alert
-                        intent={type}
-                        action={{
-                            icon: (
-                                <Dismiss16Regular
-                                    aria-label="dismiss message"
-                                    onClick={() => {
-                                        onDismissAlert(index);
-                                    }}
-                                    color="black"
-                                />
-                            ),
-                        }}
-                        key={`${index}-${type}`}
-                        className={mergeClasses(classes.alert, classes.infoAlert)}
-                    >
-                        {message}
-                    </Alert>
-                );
-            })}
             <div className={classes.header}>
                 <div className={classes.title}>
                     {!features[FeatureKeys.SimplifiedExperience].enabled && (

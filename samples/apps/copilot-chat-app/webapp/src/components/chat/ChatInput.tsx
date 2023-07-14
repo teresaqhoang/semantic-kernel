@@ -2,7 +2,8 @@
 
 import { useMsal } from '@azure/msal-react';
 import { Button, Spinner, Textarea, makeStyles, mergeClasses, shorthands, tokens } from '@fluentui/react-components';
-import { AttachRegular, MicRegular, SendRegular } from '@fluentui/react-icons';
+import { Alert } from '@fluentui/react-components/unstable';
+import { AttachRegular, Dismiss16Regular, MicRegular, SendRegular } from '@fluentui/react-icons';
 import debug from 'debug';
 import * as speechSdk from 'microsoft-cognitiveservices-speech-sdk';
 import React, { useRef } from 'react';
@@ -13,7 +14,7 @@ import { ChatMessageType } from '../../libs/models/ChatMessage';
 import { GetResponseOptions, useChat } from '../../libs/useChat';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
-import { addAlert } from '../../redux/features/app/appSlice';
+import { addAlert, removeAlert } from '../../redux/features/app/appSlice';
 import { editConversationInput } from '../../redux/features/conversations/conversationsSlice';
 import { SpeechService } from './../../libs/services/SpeechService';
 import { updateUserIsTyping } from './../../redux/features/conversations/conversationsSlice';
@@ -29,6 +30,13 @@ const useClasses = makeStyles({
     },
     typingIndicator: {
         maxHeight: '28px',
+    },
+    alert: {
+        fontWeight: tokens.fontWeightRegular,
+        color: tokens.colorNeutralForeground1,
+        backgroundColor: tokens.colorNeutralBackground6,
+        fontSize: tokens.fontSizeBase200,
+        lineHeight: tokens.lineHeightBase200,
     },
     content: {
         ...shorthands.gap(tokens.spacingHorizontalM),
@@ -83,7 +91,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
     const [documentImporting, setDocumentImporting] = React.useState(false);
     const documentFileRef = useRef<HTMLInputElement | null>(null);
     const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
-    const { activeUserInfo } = useAppSelector((state: RootState) => state.app);
+    const { activeUserInfo, alerts } = useAppSelector((state: RootState) => state.app);
 
     React.useEffect(() => {
         async function initSpeechRecognizer() {
@@ -108,6 +116,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
         const chatState = conversations[selectedId];
         setValue(chatState.input);
     }, [conversations, selectedId]);
+
+    const onDismissAlert = (index: number) => {
+        dispatch(removeAlert(index));
+    };
 
     const handleSpeech = () => {
         setIsListening(true);
@@ -171,6 +183,30 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
         <div className={classes.root}>
             <div className={classes.typingIndicator}>
                 <ChatStatus />
+            </div>
+            <div>
+                {alerts.map(({ type, message }, index) => {
+                    return (
+                        <Alert
+                            intent={type}
+                            action={{
+                                icon: (
+                                    <Dismiss16Regular
+                                        aria-label="dismiss message"
+                                        onClick={() => {
+                                            onDismissAlert(index);
+                                        }}
+                                        color="black"
+                                    />
+                                ),
+                            }}
+                            key={`${index}-${type}`}
+                            className={classes.alert}
+                        >
+                            {message}
+                        </Alert>
+                    );
+                })}
             </div>
             <div className={classes.content}>
                 <Textarea
