@@ -15,10 +15,10 @@ import {
     TabList,
     TabValue,
     tokens,
-    Tooltip,
+    Tooltip
 } from '@fluentui/react-components';
 import { Alert } from '@fluentui/react-components/unstable';
-import { Dismiss16Regular, Edit24Filled, EditRegular } from '@fluentui/react-icons';
+import { Dismiss16Regular, Edit24Filled, EditRegular, Map16Regular, Person16Regular } from '@fluentui/react-icons';
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
@@ -184,8 +184,14 @@ export const ChatWindow: React.FC = () => {
                         <Tab data-testid="chatTab" id="chat" value="chat">
                             Chat
                         </Tab>
-                        <Tab data-testid="filesTab" id="files" value="files">
-                            Files
+                        <Tab data-testid="documentsTab" id="documents" value="documents">
+                            Documents
+                        </Tab>
+                        <Tab data-testid="plansTab" id="plans" value="plans" icon={<Map16Regular />}>
+                            Plans
+                        </Tab>
+                        <Tab data-testid="personaTab" id="persona" value="persona" icon={<Person16Regular />}>
+                            Persona
                         </Tab>
                     </TabList>
                 </div>
@@ -203,7 +209,7 @@ export const ChatWindow: React.FC = () => {
                 )}
             </div>
             {selectedTab === 'chat' && <ChatRoom />}
-            {selectedTab === 'files' && <ChatResourceList chatId={selectedId} />}
+            {selectedTab === 'documents' && <ChatResourceList chatId={selectedId} />}
         </div>
     );
 };
