@@ -2,8 +2,7 @@
 
 import { useMsal } from '@azure/msal-react';
 import { Button, Spinner, Textarea, makeStyles, mergeClasses, shorthands, tokens } from '@fluentui/react-components';
-import { Alert } from '@fluentui/react-components/unstable';
-import { AttachRegular, Dismiss16Regular, MicRegular, SendRegular } from '@fluentui/react-icons';
+import { AttachRegular, MicRegular, SendRegular } from '@fluentui/react-icons';
 import debug from 'debug';
 import * as speechSdk from 'microsoft-cognitiveservices-speech-sdk';
 import React, { useRef } from 'react';
@@ -14,11 +13,13 @@ import { ChatMessageType } from '../../libs/models/ChatMessage';
 import { GetResponseOptions, useChat } from '../../libs/useChat';
 import { useAppDispatch, useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
-import { addAlert, removeAlert } from '../../redux/features/app/appSlice';
+import { FeatureKeys } from '../../redux/features/app/AppState';
+import { addAlert } from '../../redux/features/app/appSlice';
 import { editConversationInput } from '../../redux/features/conversations/conversationsSlice';
 import { SpeechService } from './../../libs/services/SpeechService';
 import { updateUserIsTyping } from './../../redux/features/conversations/conversationsSlice';
 import { ChatStatus } from './ChatStatus';
+import { Alerts } from './shared/Alerts';
 
 const log = debug(Constants.debug.root).extend('chat-input');
 
@@ -91,7 +92,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
     const [documentImporting, setDocumentImporting] = React.useState(false);
     const documentFileRef = useRef<HTMLInputElement | null>(null);
     const { conversations, selectedId } = useAppSelector((state: RootState) => state.conversations);
-    const { activeUserInfo, alerts } = useAppSelector((state: RootState) => state.app);
+    const { activeUserInfo, features } = useAppSelector((state: RootState) => state.app);
 
     React.useEffect(() => {
         async function initSpeechRecognizer() {
@@ -116,10 +117,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
         const chatState = conversations[selectedId];
         setValue(chatState.input);
     }, [conversations, selectedId]);
-
-    const onDismissAlert = (index: number) => {
-        dispatch(removeAlert(index));
-    };
 
     const handleSpeech = () => {
         setIsListening(true);
@@ -175,8 +172,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
     };
 
     const handleDrop = (e: React.DragEvent<HTMLTextAreaElement>) => {
-        onDragLeave(e);
-        handleImport(e.dataTransfer.files);
+        if (!features[FeatureKeys.SimplifiedExperience].enabled) {
+            onDragLeave(e);
+            handleImport(e.dataTransfer.files);
+        }
     };
 
     return (
@@ -184,30 +183,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
             <div className={classes.typingIndicator}>
                 <ChatStatus />
             </div>
-            <div>
-                {alerts.map(({ type, message }, index) => {
-                    return (
-                        <Alert
-                            intent={type}
-                            action={{
-                                icon: (
-                                    <Dismiss16Regular
-                                        aria-label="dismiss message"
-                                        onClick={() => {
-                                            onDismissAlert(index);
-                                        }}
-                                        color="black"
-                                    />
-                                ),
-                            }}
-                            key={`${index}-${type}`}
-                            className={classes.alert}
-                        >
-                            {message}
-                        </Alert>
-                    );
-                })}
-            </div>
+            <Alerts />
             <div className={classes.content}>
                 <Textarea
                     id="chat-input"
@@ -254,7 +230,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
                 />
             </div>
             <div className={classes.controls}>
-                <div className={classes.functional}>
+                {!features[FeatureKeys.SimplifiedExperience].enabled && <div className={classes.functional}>
                     {/* Hidden input for file upload. Only accept .txt and .pdf files for now. */}
                     <input
                         type="file"
@@ -273,7 +249,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ isDraggingOver, onDragLeav
                         onClick={() => documentFileRef.current?.click()}
                     />
                     {documentImporting && <Spinner size="tiny" />}
-                </div>
+                </div>}
                 <div className={classes.essentials}>
                     {recognizer && (
                         <Button

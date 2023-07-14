@@ -27,6 +27,7 @@ import { ChatResourceList } from './ChatResourceList';
 import { ChatRoom } from './ChatRoom';
 import { ParticipantsList } from './controls/ParticipantsList';
 import { ShareBotMenu } from './controls/ShareBotMenu';
+import { Alerts } from './shared/Alerts';
 import { EditChatName } from './shared/EditChatName';
 
 const useClasses = makeStyles({
@@ -102,6 +103,7 @@ export const ChatWindow: React.FC = () => {
 
     return (
         <div className={classes.root}>
+            {selectedTab !== 'chat' && <Alerts />}
             <div className={classes.header}>
                 <div className={classes.title}>
                     {!features[FeatureKeys.SimplifiedExperience].enabled && (
