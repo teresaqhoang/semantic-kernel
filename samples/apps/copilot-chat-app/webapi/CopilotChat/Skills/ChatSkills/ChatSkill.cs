@@ -88,7 +88,8 @@ public class ChatSkill
         this._kernel = kernel;
         this._chatMessageRepository = chatMessageRepository;
         this._chatSessionRepository = chatSessionRepository;
-        this._promptOptions = promptOptions.Value;
+        // Clone the prompt options to avoid modifying the original prompt options.
+        this._promptOptions = promptOptions.Value.Copy();
 
         this._semanticChatMemorySkill = new SemanticChatMemorySkill(
             promptOptions);
@@ -262,6 +263,9 @@ public class ChatSkill
         [Description("ID of the response message for planner"), DefaultValue(null), SKName("responseMessageId")] string? messageId,
         SKContext context)
     {
+        // Set the system description in the prompt options
+        // await SetSystemDescriptionAsync(chatId);
+
         // Save this new message to memory such that subsequent chat responses can use it
         await this.SaveNewMessageAsync(message, userId, userName, chatId, messageType);
 
@@ -674,6 +678,22 @@ public class ChatSkill
         string botResponseTokenUsage = chatContext.Variables.TryGetValue("promptTokenUsage", out string? promptTokenUsage) ? promptTokenUsage : "0";
         resultContext.Variables.Set("promptTokenUsage", botResponseTokenUsage);
         resultContext.Variables.Set("dependencyTokenUsage", (dependencyTokenUsage).ToString(CultureInfo.InvariantCulture));
+    }
+
+    /// <summary>
+    /// Set the system description in the prompt options.
+    /// </summary>
+    /// <param name="chatId">Id of the chat session</param>
+    /// <exception cref="ArgumentException">Throw if the chat session does not exist.</exception>
+    private async Task SetSystemDescriptionAsync(string chatId)
+    {
+        ChatSession? chatSession = null;
+        if (!await this._chatSessionRepository.TryFindByIdAsync(chatId, v => chatSession = v))
+        {
+            throw new ArgumentException("Chat session does not exist.");
+        }
+
+        this._promptOptions.SystemDescription = chatSession!.SystemDescription;
     }
 
     # endregion
