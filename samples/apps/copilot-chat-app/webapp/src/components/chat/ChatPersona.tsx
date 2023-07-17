@@ -41,13 +41,17 @@ export const ChatPersona: React.FC = () => {
                 isEditable={true}
                 info="The prompt that defines the chat bot's persona."
                 modificationHandler={async (newSystemDescription: string) => {
-                    await chatService.editChatAsync(
+                    chatService.editChatAsync(
                         chat.id,
                         chat.title,
                         newSystemDescription,
                         await AuthHelper.getSKaaSAccessToken(instance, inProgress)
-                    );
-                    dispatch(editConversationSystemDescription({ id: chat.id, newSystemDescription: newSystemDescription }));
+                    ).finally(() => {
+                        dispatch(editConversationSystemDescription({
+                            id: chat.id,
+                            newSystemDescription: newSystemDescription
+                        }));
+                    });
                 }}
             />
             <PromptEditor

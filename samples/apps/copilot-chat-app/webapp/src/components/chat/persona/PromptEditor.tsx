@@ -50,6 +50,7 @@ export const PromptEditor: React.FC<PromptEditorProps> = ({
     const onSaveButtonClick = () => {
         if (modificationHandler) {
             modificationHandler(value).catch((error) => {
+                setValue(prompt);
                 const message = `Error saving the new prompt: ${(error as Error).message}`;
                 dispatch(
                     addAlert({
