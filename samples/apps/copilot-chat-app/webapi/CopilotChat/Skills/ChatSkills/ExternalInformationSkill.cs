@@ -116,6 +116,8 @@ public class ExternalInformationSkill
                 planResult = newPlanContext.Variables.Input;
             }
 
+            context.Variables.Set("planExecutionTokenUsage", Utilities.GetTokenUsage(newPlanContext).ToString(CultureInfo.InvariantCulture));
+
             return $"{PromptPreamble}\n{planResult.Trim()}\n{PromptPostamble}\n";
         }
         else

@@ -57,6 +57,7 @@ export const SettingsDialog: React.FC<ISettingsDialogProps> = ({ open, closeDial
                             sessionTotal
                             promptUsage={tokenUsage.prompt}
                             dependencyUsage={tokenUsage.dependency}
+                            planExecutionUsage={tokenUsage.planExecution}
                         />
                         {settings.map((setting) => {
                             return <SettingSection key={setting.title} setting={setting} />;

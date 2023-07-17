@@ -30,6 +30,7 @@ export interface Setting {
 export interface TokenUsages {
     prompt: number;
     dependency: number;
+    planExecution: number;
 }
 
 export interface AppState {
@@ -120,5 +121,6 @@ export const initialState: AppState = {
     tokenUsage: {
         prompt: 0,
         dependency: 0,
+        planExecution: 0,
     },
 };
