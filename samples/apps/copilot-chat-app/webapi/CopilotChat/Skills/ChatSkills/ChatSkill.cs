@@ -348,6 +348,7 @@ public class ChatSkill
         // If plan is suggested, send back to user for approval before running
         if (this._externalInformationSkill.ProposedPlan != null)
         {
+            chatContext.Variables.Set("prompt", this._externalInformationSkill.ProposedPlan.Plan.Description);
             return JsonSerializer.Serialize<ProposedPlan>(this._externalInformationSkill.ProposedPlan);
         }
 
