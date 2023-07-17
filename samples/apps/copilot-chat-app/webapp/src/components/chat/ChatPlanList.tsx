@@ -4,6 +4,7 @@ import {
     Table,
     TableBody,
     TableCell,
+    TableCellActions,
     TableCellLayout,
     TableColumnDefinition,
     TableColumnId,
@@ -24,6 +25,7 @@ import { useAppSelector } from '../../redux/app/hooks';
 import { RootState } from '../../redux/app/store';
 import { SharedStyles } from '../../styles';
 import { timestampToDateString } from '../utils/TextUtils';
+import { RawPlanViewer } from './plan-viewer/RawPlanViewer';
 
 const useClasses = makeStyles({
     root: {
@@ -46,6 +48,7 @@ interface TableItem {
         timestamp: number;
     };
     tokens: number;
+    message: IChatMessage;
 }
 
 export const ChatPlanList: React.FC = () => {
@@ -97,6 +100,9 @@ function useTable(planMessages: IChatMessage[]) {
                     <TableCellLayout>
                         {item.ask}
                     </TableCellLayout>
+                    <TableCellActions>
+                        <RawPlanViewer message={item.message} />
+                    </TableCellActions>
                 </TableCell>
             ),
             compare: (a, b) => {
@@ -159,6 +165,7 @@ function useTable(planMessages: IChatMessage[]) {
                 timestamp: message.timestamp,
             },
             tokens: message.userId.length,
+            message: message,
         }
     });
 
