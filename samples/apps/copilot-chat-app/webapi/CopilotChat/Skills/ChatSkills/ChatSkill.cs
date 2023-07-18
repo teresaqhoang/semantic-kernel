@@ -92,7 +92,8 @@ public class ChatSkill
         this._promptOptions = promptOptions.Value.Copy();
 
         this._semanticChatMemorySkill = new SemanticChatMemorySkill(
-            promptOptions);
+            promptOptions,
+            chatSessionRepository);
         this._documentMemorySkill = new DocumentMemorySkill(
             promptOptions,
             documentImportOptions);
@@ -264,7 +265,7 @@ public class ChatSkill
         SKContext context)
     {
         // Set the system description in the prompt options
-        await SetSystemDescriptionAsync(chatId);
+        await this.SetSystemDescriptionAsync(chatId);
 
         // Save this new message to memory such that subsequent chat responses can use it
         await this.SaveNewMessageAsync(message, userId, userName, chatId, messageType);

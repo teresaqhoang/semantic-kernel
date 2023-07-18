@@ -14,4 +14,5 @@ export interface ChatState {
     input: string;
     isBotTyping: boolean;
     userDataLoaded: boolean;
+    memoryBalance: number;
 }
