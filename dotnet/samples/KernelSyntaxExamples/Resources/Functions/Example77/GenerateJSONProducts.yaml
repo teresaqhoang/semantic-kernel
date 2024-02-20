@@ -1,0 +1,65 @@
+name: GenerateJSONProducts
+template_format: semantic-kernel
+template: |
+  Given the following company description, brainstorm five different products, each with a unique name and function. Be original and ensure that the products make sense in the company's context. 
+  Think of products that have market potential and are realistic to the company. Each product name should be catchy and easy to remember. Limit each name to 3 or 4 words max.
+
+  Organize these products into a JSON array, where each product is defined as:
+  {
+    "name": string,
+    "description": string
+  }
+
+  Then, output your response as a JSON object containing a property named "products" as the key and the array as the the value. Ensure the JSON is well formed and valid.
+
+  This is an example of a valid response: 
+  ---
+  {
+    products: [
+      {
+        name: SmartCode SK,
+        description: An AI solution that utilizes AI agent programming to automate code writing and assess the quality of code, reducing the need for manual review and increasing code efficiencyrn    
+      },
+      {
+        name: ProjectMind SK,
+        description: An AI-powered project management tool that utilizes Semantic Kernel to automate project planning, task scheduling, and enable more effective communication within teamsrn    
+      },
+      {
+        name: SK WriterPlus,
+        description: An AI-driven writing solution that uses AI Agents and Semantic Kernel technology to automate content creation, editing, and proofreading tasks
+      },
+      {
+        name: SQA Tester SK,
+        description: A software product that utilizes AI agents to execute tests, assess the code delivered and iterate. It uses a divide-and-conquer approach to simplify complex testing problemsrn
+      },
+      {
+        name: SK CloudMaster,
+        description: An AI solution that intelligently manages and orchestrates cloud resources using the power of AI agents and Semantic Kernel technology, ready for enterprise and production environmentsrn
+      }
+    ]
+  }
+  ---
+  Now, begin.
+  The company description:
+  ---
+  {{$input}} 
+  ---
+  AGAIN ENSURE YOU FOLLOW THE DESCRIBED JSON FORMAT. IF YOU FOLLOW IT WELL, I WILL PRAISE YOU AND GIVE YOU A BONUS!!!
+  The JSON format should look like this:
+  ---
+  {
+    products: [
+      {
+        "name": string
+        "description": string
+      },
+      ...
+    ]
+  }
+description: Given a company's description, generate a list of five unique products, in which every product contains a unique name and short description.
+input_variables:
+  - name: companyDescription
+    description: Description of company to generate products for.
+    is_required: true
+output_variable:
+  description: JSON object containing one property named "products" as the key and array of generated products as the value.

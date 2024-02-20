@@ -7,6 +7,7 @@ using Examples;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Planning.Handlebars;
 using Microsoft.SemanticKernel.PromptTemplates.Handlebars;
+using Resources;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -39,28 +40,27 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
     {
         this.WriteLine("======== Handlebars Prompt Syntax Sample ========");
 
-        string openAIModelId = TestConfiguration.OpenAI.ChatModelId;
-        string openAIApiKey = TestConfiguration.OpenAI.ApiKey;
+        string apiKey = TestConfiguration.AzureOpenAI.ApiKey;
+        string chatDeploymentName = TestConfiguration.AzureOpenAI.ChatDeploymentName;
+        string chatModelId = TestConfiguration.AzureOpenAI.ChatModelId;
+        string endpoint = TestConfiguration.AzureOpenAI.Endpoint;
 
-        if (openAIApiKey == null)
+        if (apiKey == null || chatDeploymentName == null || chatModelId == null || endpoint == null)
         {
-            this.WriteLine("OpenAI credentials not found. Skipping example.");
+            WriteLine("Azure endpoint, apiKey, deploymentName, or modelId not found. Skipping example.");
             return;
         }
 
-        if (openAIModelId == null)
-        {
-            this.WriteLine("openAIModelId credentials not found. Skipping example.");
-            return;
-        }
-
-        Kernel kernel = Kernel.CreateBuilder()
-            .AddOpenAIChatCompletion(
-                modelId: openAIModelId,
-                apiKey: openAIApiKey)
+        var kernel = Kernel.CreateBuilder()
+            .AddAzureOpenAIChatCompletion(
+                deploymentName: chatDeploymentName,
+                endpoint: endpoint,
+                serviceId: "AzureOpenAIChat",
+                apiKey: apiKey,
+                modelId: chatModelId)
             .Build();
 
-        KernelPlugin productMagicianPlugin = GenerateProductMagicianPlugin();
+        KernelPlugin productMagicianPlugin = GenerateProductMagicianPlugin(kernel);
         kernel.Plugins.Add(productMagicianPlugin);
 
         await TestProductFunctionsAsync(kernel);
@@ -239,32 +239,11 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
         WriteLine($"Result: {productDescriptionResult}");
     }
 
-    private KernelPlugin GenerateProductMagicianPlugin()
+    private KernelPlugin GenerateProductMagicianPlugin(Kernel kernel)
     {
-        this.KernelFunctionGenerateProductNames =
-            KernelFunctionFactory.CreateFromPrompt(
-                "Given the company description, generate five different product names in name and with a function " +
-                "that match the company description. " +
-                "Ensure that they match the company and are aligned to it. " +
-                "Think of products this company would really make and also have market potential. " +
-                "Be original and do not make too long names or use more than 3-4 words for them." +
-                "Also, the product name should be catchy and easy to remember. " +
-                "Output the product names in a JSON array inside a JSON object named products. " +
-                "On them use the name and description as keys." +
-                "Ensure the JSON is well formed and is valid" +
-                "The company description: " +
-                "---" +
-                "{{$input}} " +
-                "---" +
-                "AGAIN ENSURE YOU FOLLOW THE DESCRIBED JSON FORMAT " +
-                "IF YOU FOLLOW IT WELL I WILL PRAISE YOU " +
-                "AND GIVE YOU A BONUS!!!" +
-                "The JSON format should look like this:" +
-                "---" +
-                "{\r\n\"products\": [\r\n    {\r\n        \"name\": \"SmartCode SK\",\r\n        \"description\": \"An AI solution that utilizes AI agent programming to automate code writing and assess the quality of code, reducing the need for manual review and increasing code efficiency\"\r\n    },\r\n    {\r\n        \"name\": \"ProjectMind SK\",\r\n        \"description\": \"An AI-powered project management tool that utilizes Semantic Kernel to automate project planning, task scheduling, and enable more effective communication within teams\"\r\n    },\r\n    {\r\n        \"name\": \"SK WriterPlus\",\r\n        \"description\": \"An AI-driven writing solution that uses AI Agents and Semantic Kernel technology to automate content creation, editing, and proofreading tasks\"\r\n    },\r\n    {\r\n        \"name\": \"SQA Tester SK\",\r\n        \"description\": \"A software product that utilizes AI agents to execute tests, assess the code delivered and iterate. It uses a divide-and-conquer approach to simplify complex testing problems\"\r\n    },\r\n    {\r\n        \"name\": \"SK CloudMaster\",\r\n        \"description\": \"An AI solution that intelligently manages and orchestrates cloud resources using the power of AI agents and Semantic Kernel technology, ready for enterprise and production environments\"\r\n    }\r\n]\r\n}" +
-                 "---",
-                functionName: "GenerateJSONProducts",
-                description: "Generate a JSON with five unique product objects, every object containing a unique name and short description matching company .");
+        // Load GenerateJSONProducts prompt from resource
+        var generateProductsYaml = EmbeddedResource.Read("Functions.Example77.GenerateJSONProducts.yaml");
+        this.KernelFunctionGenerateProductNames = kernel.CreateFunctionFromPromptYaml(generateProductsYaml);
 
         this.KernelFunctionGenerateProductDescription =
             KernelFunctionFactory.CreateFromPrompt(
