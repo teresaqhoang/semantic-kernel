@@ -1,0 +1,39 @@
+name: GenerateDetailedProducts
+template_format: handlebars
+template: |
+  Given a company description and a list of product proposals, each containing a name and simple description, generate an additional description and development approach for each product that are compelling, engaging and stunning.
+
+  Guidelines for the new description:
+  - Think of marketing terms and use positive words, but do not lie and oversell. 
+  - Be original and do not make a description that's too lengthy. The description should be limited to 2 paragraphs max.
+  - The description should be catchy and easy to remember.
+
+  Finally, detail an approach on how someone could develop the product with Semantic Kernel.
+
+  The final output should be a list of the same products with additional `detailedDescription` and `developmentApproach` fields, where each product is defined as:
+  {
+    "name": string,
+    "description": string,
+    "detailedDescription": string,
+    "developmentApproach: string
+  }
+
+  This is the company description:
+  {{companyDescription}}
+
+  Here are the proposed products:
+  {{set "proposedProducts" (productMagician-GenerateJsonProducts companyDescription)}}
+
+  {{#if proposedProducts.products}}
+    {{!-- If array exists, render array of products --}}
+    {{json proposedProducts.products}}
+  {{else}}
+    {{json proposedProducts}}
+  {{/if}}
+description: Given a company's description, generate a list of five unique products, in which every product contains a unique name and short description.
+input_variables:
+  - name: companyDescription
+    description: Description of company to generate products for.
+    is_required: true
+output_variable:
+  description: JSON array of product proposals matching the company description.
