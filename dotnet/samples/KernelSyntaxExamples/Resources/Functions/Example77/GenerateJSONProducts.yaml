@@ -1,4 +1,4 @@
-name: GenerateJSONProducts
+name: GenerateJsonProducts
 template_format: semantic-kernel
 template: |
   Given the following company description, brainstorm five different products, each with a unique name and function. Be original and ensure that the products make sense in the company's context. 

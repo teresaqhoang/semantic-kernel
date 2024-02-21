@@ -79,7 +79,7 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
         string handlebarsTemplate3 = @"
             {{!-- example of set with input and function calling with two syntax types --}}
             {{set ""companyDescription"" input}}
-            {{set ""productNames"" (productMagician-GenerateJSONProducts companyDescription)}}
+            {{set ""productNames"" (productMagician-GenerateJsonProducts companyDescription)}}
 
             {{#if generateEngagingDescriptions}} 
                 {{!-- Step 2: Create array for storing final descriptions --}}
@@ -121,7 +121,7 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
         string handlebarsTemplate2 = @"
             {{!-- example of set with input and function calling with two syntax types --}}
             {{set ""companyDescription"" input}}
-            {{set ""productNames"" (productMagician-GenerateJSONProducts companyDescription)}}
+            {{set ""productNames"" (productMagician-GenerateJsonProducts companyDescription)}}
             {{json productNames}}
 
             {{set ""finalDescriptionsV2"" ""- PRODUCTS AND ENGAGING DESCRIPTIONS -""}}
@@ -150,7 +150,7 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
         string handlebarsTemplate01 = @"
             {{!-- example of set with input and function calling with two syntax types --}}
             {{set ""companyDescription"" input}}
-            {{set ""productNames"" (productMagician-GenerateJSONProducts companyDescription)}}
+            {{set ""productNames"" (productMagician-GenerateJsonProducts companyDescription)}}
 
             {{set ""output"" (concat ""Company description: "" companyDescription "" product Names: "" productNames)}}
             {{json output}}";
@@ -163,7 +163,7 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
         string handlebarsTemplate01 = @"
             {{!-- example of set with input and function calling showcasing direct output of the generated value --}}
             {{set ""companyDescription"" input}}
-            {{set ""productNames"" (productMagician-GenerateJSONProducts companyDescription)}}
+            {{set ""productNames"" (productMagician-GenerateJsonProducts companyDescription)}}
             {{json productNames}}";
 
         await ExecuteHandlebarsPromptAsync(kernel, CompanyDescription, handlebarsTemplate01);
@@ -241,8 +241,8 @@ public class Example77_HandlebarsPromptSyntax : BaseTest
 
     private KernelPlugin GenerateProductMagicianPlugin(Kernel kernel)
     {
-        // Load GenerateJSONProducts prompt from resource
-        var generateProductsYaml = EmbeddedResource.Read("Functions.Example77.GenerateJSONProducts.yaml");
+        // Load GenerateJsonProducts prompt from resource
+        var generateProductsYaml = EmbeddedResource.Read("Functions.Example77.GenerateJsonProducts.yaml");
         this.KernelFunctionGenerateProductNames = kernel.CreateFunctionFromPromptYaml(generateProductsYaml);
 
         this.KernelFunctionGenerateProductDescription =
